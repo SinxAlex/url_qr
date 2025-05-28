@@ -49,6 +49,7 @@ $config = [
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
                 'get-qr' => '/site/get-qr',
                 'redirect-qr' => '/site/redirect-qr',
+                'journal' => '/site/journal',
             ],
         ],
     ],

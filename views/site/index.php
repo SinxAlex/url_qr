@@ -19,28 +19,37 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'url_to',['options'=>['class' => 'flex-grow-1']])->textInput(['class' => 'form-control w-100', 'placeholder' => 'Введите URL'])->label(false) ?>
         <div class="input-group-append">
             <?= Html::submitButton('Найти', ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Журнал', ['/journal', 'id' => ''], ['class' => 'btn btn-primary']) ?>
         </div>
     </div>
     <?php ActiveForm::end(); ?>
 </div>
-<div class="card"  id="block-qr" style="width: 18rem; visibility: hidden;" >
-    <img id="qr-code-image" src="" alt="QR Code" class="img-fluid" style="width: 250px; height: 250px;">
-    <div class="card-body">
-        <p class="text-muted">
-            Короткая ссылка : <a href="#" id='url-short' class="text-reset">reset link</a>.
-        </p>
+
+<div class="d-flex justify-content-center gap-3 flex-wrap">
+    <div class="card" id="block-qr" style="width: 18rem; visibility: hidden;">
+        <img id="qr-code-image" src="" alt="QR Code" class="img-fluid" style="margin:0 auto;width: 250px; height: 250px;">
+        <div class="card-body">
+            <p class="text-muted">
+                Короткая ссылка : <a href="#" id='url-short' class="text-reset">reset link</a>.
+            </p>
+        </div>
+    </div>
+    <div class="card" id="info-qr" style="width: 18rem; visibility: hidden;">
+        <div class="card-body">
+
+        </div>
     </div>
 </div>
-<div class="card"  id="info-qr" style="width: 18rem; visibility: hidden;" >
-    <div class="card-body">
-    </div>
-</div>
+
 
 <?php
 $script = <<< JS
   $(document).on('submit',function(e) {
     e.preventDefault();
-    
+   $('#block-qr').css('visibility','hidden');
+   $('#info-qr').css('visibility','hidden');
+   
+   
     var form = $('#form-qr');
     var button = $('#submit-btn');
     
@@ -57,7 +66,7 @@ $script = <<< JS
              $('#url-short').text(response['data']['short_url']);
              $('#block-qr').css('visibility','visible');
              $('#info-qr').css('visibility','visible');
-             $('#block-qr').css('visibility','visible');
+             $('#info-qr').find('.card-body').text("количество посещений:"+ response['data']['views']);
             console.log(response);
             }else {
             alert(response.error);
@@ -66,7 +75,7 @@ $script = <<< JS
         },
         error: function(xhr) {
               $('#block-qr').empty();
-                  $('#block-qr').css('visibility','hidden');
+              $('#info-qr').empty();
             console.error('Ошибка:', xhr.responseText);
         },
         complete: function() {

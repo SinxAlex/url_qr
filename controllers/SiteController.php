@@ -13,6 +13,7 @@ use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\UrlModel;
 use Da\QrCode\QrCode;
+use yii\data\ActiveDataProvider;
 
 class SiteController extends Controller
 {
@@ -156,7 +157,7 @@ class SiteController extends Controller
                     'url'=>$model->url_to,
                     'url-image'=>'data:image/png;base64,'.base64_encode($qrCode->writeString()),
                     'short_url'=>$model->url_short,
-                    'info'=>$model->getLogsIp(),
+                    'views'=>$model->views,
                     ];
             } else {
                 $out['error'] = json_encode($model->errors);
@@ -173,6 +174,20 @@ class SiteController extends Controller
                 $model_log->save();
             }
             return $this->render('redirect',['url'=>\yii\helpers\Url::to($url)]);
+
+        }
+
+        public function actionJournal()
+        {
+
+            $provider = new ActiveDataProvider([
+                'query' => UrlLogModel::find(),
+                'pagination' => [
+                    'pageSize' => 10,
+                ],
+            ]);
+
+            return $this->render('journal',['provider'=>$provider]);
 
         }
 }

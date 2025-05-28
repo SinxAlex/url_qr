@@ -67,7 +67,7 @@ class UrlLogModel extends \yii\db\ActiveRecord
             [['created_at','ip','url_from'], 'safe'],
             [['created_at', 'id_url'], 'integer'],
             [['url_from'], 'string', 'max' => 250],
-            [['ip'], 'string', 'max' => 50],
+            [['ip'], 'string', 'max' => 15],
             [['id_url'], 'exist', 'skipOnError' => true, 'targetClass' => UrlModel::class, 'targetAttribute' => ['id_url' => 'id']],
         ];
     }
@@ -80,7 +80,7 @@ class UrlLogModel extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'created_at' => 'Created At',
-            'id_url' => 'Id Url',
+            'id_url' => 'Url',
             'url_from' => 'Url From',
             'ip' => 'Ip',
         ];
