@@ -6,6 +6,9 @@
 ## Установленные пакеты:
 [![Documentation](https://img.shields.io/badge/docs-qrcode--library-blue?style=flat-square&logo=read-the-docs)](https://qrcode-library.readthedocs.io/en/latest/)
 
+## Основной контроллер:
+    controllers/SiteController.php
+
 ## Пример кода:
 
 ```php

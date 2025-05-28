@@ -12,10 +12,10 @@ services:
         ports:
             - "8080:80"
         depends_on:
-             db:
-                 condition: service_healthy
+            db:
+                condition: service_healthy
         command: >
-            sh -c "php yii migrate/up --interactive=0 --color=1
+            sh -c "composer install && php yii migrate/up --interactive=0 --color=1
             && apache2-foreground"
         networks:
             - my_network
