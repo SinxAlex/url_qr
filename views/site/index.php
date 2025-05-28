@@ -16,10 +16,7 @@ use yii\widgets\ActiveForm;
       //  'enableAjaxValidation' => true,
     ]); ?>
     <div class="input-group">
-        <?= $form->field($model, 'url_to')->textInput([
-            'class' => 'form-control',
-            'placeholder' => 'Введите URL'
-        ])->label(false) ?>
+        <?= $form->field($model, 'url_to')->textInput(['class' => 'form-control w-100', 'placeholder' => 'Введите URL'])->label(false) ?>
         <div class="input-group-append">
             <?= Html::submitButton('Найти', ['class' => 'btn btn-primary']) ?>
         </div>

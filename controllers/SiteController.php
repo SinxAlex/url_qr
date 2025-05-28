@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\UrlModel;
+use Da\QrCode\QrCode;
 
 class SiteController extends Controller
 {
@@ -132,13 +133,25 @@ class SiteController extends Controller
     public function actionGetUrl()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $out = ['success' => false,'response_error'=>'','data'=>''];
+
             $model=new UrlModel();
             if($model->load(Yii::$app->request->post()) && $model->validate())
             {
+                $qrCode = (new QrCode($model->url_to))
+                    ->setSize(250)
+                    ->setMargin(5)
+                    ->setBackgroundColor(51, 153, 255);
+
+                $out['success'] = true;
+                $out['data'] = base64_encode($qrCode->writeString());
+
+                $model->views=1;
                 $model->save();
             }else{
-                return json_encode($model->errors);
+                $out['response_error'] = $model->errors;
             }
-
+        return $out;
     }
 }

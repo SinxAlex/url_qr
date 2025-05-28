@@ -52,12 +52,10 @@ class UrlModel extends ActiveRecord
     public function rules()
     {
         return [
-            [['url_from', 'url_to', 'url_sort', 'ip'], 'required'],
+            ['url_to', 'required'],
             [['created_at', 'updated_at', 'views'], 'integer'],
-            [['created_at', 'updated_at','url_from','ip'],'safe'],
-            [['url_from', 'url_to'], 'string'],
+            [['created_at', 'updated_at',],'safe'],
             [['url_sort'], 'string', 'max' => 100],
-            [['ip'], 'string', 'max' => 50],
             [['url_to'], 'url', 'defaultScheme' => 'https'],
             ['url_to', 'validateUrl'],
         ];
@@ -68,8 +66,7 @@ class UrlModel extends ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
-                $this->url_from = Yii::$app->request->referrer ?: 'direct';
-                $this->ip = Yii::$app->request->userIP;
+                $this->url_sort=$this->getSortUrl();
             }
             return true;
         }
@@ -118,5 +115,10 @@ class UrlModel extends ActiveRecord
         public function getSortUrl()
         {
             return $this->url_to;
+        }
+
+        public function getLogUrl()
+        {
+            return $this->hasMany(UrlLogModel::class, ['url_id' => 'id']);
         }
 }
