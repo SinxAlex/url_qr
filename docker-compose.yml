@@ -2,7 +2,7 @@ services:
     web:
         build:
             context: .
-            dockerfile: DockerFile
+            dockerfile: Dockerfile
         container_name: yii2_web
         working_dir: /var/www/html
         volumes:
