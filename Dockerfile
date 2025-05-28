@@ -27,7 +27,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Установка зависимостей Composer (без dev-зависимостей для production)
-RUN composer install --ignore-platform-req=ext-gd
+RUN composer install
 
 # Установка прав на runtime и assets
 RUN chmod -R 775 /var/www/html/runtime \
