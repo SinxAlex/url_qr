@@ -6,6 +6,11 @@
 ## Установленные пакеты:
 [![Documentation](https://img.shields.io/badge/docs-qrcode--library-blue?style=flat-square&logo=read-the-docs)](https://qrcode-library.readthedocs.io/en/latest/)
 
+## Сборка образа в Docker
+    git clone https://github.com/SinxAlex/url_qr.git
+    cd url_qr
+    docker-compose up -d
+
 ## Основной контроллер:
     controllers/SiteController.php
 
