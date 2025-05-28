@@ -10,8 +10,8 @@ use yii\widgets\ActiveForm;
 ?>
 <div class="mx-auto bg-light p-3">
     <?php $form = ActiveForm::begin([
-        'action' => '/site/get-url',
-        'method' => 'get',
+        'action' => '/web/get-url',
+        'method' => 'post',
         'id' => 'form-qr',
       //  'enableAjaxValidation' => true,
     ]); ?>
@@ -27,3 +27,12 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 </div>
 
+<?php
+$script = <<< JS
+  
+  
+  
+  
+JS;
+$this->registerJs($script, yii\web\View::POS_END);
+?>

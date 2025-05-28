@@ -131,6 +131,14 @@ class SiteController extends Controller
 
     public function actionGetUrl()
     {
-        return 2;
+        Yii::$app->response->format = Response::FORMAT_JSON;
+            $model=new UrlModel();
+            if($model->load(Yii::$app->request->post()) && $model->validate())
+            {
+                $model->save();
+            }else{
+                return json_encode($model->errors);
+            }
+
     }
 }

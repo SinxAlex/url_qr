@@ -1,7 +1,8 @@
 <?php
 
 namespace app\models;
-
+use yii\db\ActiveRecord;
+use yii\behaviors\TimestampBehavior;
 use Yii;
 
 /**
@@ -16,7 +17,7 @@ use Yii;
  * @property string $ip
  * @property int $views
  */
-class UrlModel extends \yii\db\ActiveRecord
+class UrlModel extends ActiveRecord
 {
 
 
@@ -28,20 +29,52 @@ class UrlModel extends \yii\db\ActiveRecord
         return 'url';
     }
 
+
+    /**
+     * функция для сохранения времени
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at', 'updated_at'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['updated_at'],
+                ],
+                'value' => function() { return time(); },
+            ],
+        ];
+    }
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['created_at', 'updated_at', 'url_from', 'url_to', 'url_sort', 'ip', 'views'], 'required'],
+            [['url_from', 'url_to', 'url_sort', 'ip'], 'required'],
             [['created_at', 'updated_at', 'views'], 'integer'],
+            [['created_at', 'updated_at','url_from','ip'],'safe'],
             [['url_from', 'url_to'], 'string'],
             [['url_sort'], 'string', 'max' => 100],
             [['ip'], 'string', 'max' => 50],
+            [['url_to'], 'url', 'defaultScheme' => 'https'],
+            ['url_to', 'validateUrl'],
         ];
     }
 
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->url_from = Yii::$app->request->referrer ?: 'direct';
+                $this->ip = Yii::$app->request->userIP;
+            }
+            return true;
+        }
+        return false;
+    }
     /**
      * {@inheritdoc}
      */
@@ -58,5 +91,32 @@ class UrlModel extends \yii\db\ActiveRecord
             'views' => 'Views',
         ];
     }
+    public function validateUrl()
+    {
+        if (empty($this->url_to)) {
+            $this->addError('url_to', 'Поле URL не может быть пустым.');
+            return; // Прекращаем дальнейшую проверку
+        }
 
+        // Дополнительная проверка формата URL
+        if (!filter_var($this->url_to, FILTER_VALIDATE_URL)) {
+            $this->addError('url_to', 'Некорректный формат URL.');
+            return;
+        }
+
+        // Проверка доступности сайта
+        $headers = @get_headers($this->url_to);
+        if (!$headers || !preg_match('/^HTTP\/\d\.\d\s+(200|301|302)/', $headers[0])) {
+            $this->addError('url_to', 'URL не отвечает или возвращает ошибку.');
+        }
+    }
+
+        /**
+         * @return string
+         * функция для сокращения url
+         */
+        public function getSortUrl()
+        {
+            return $this->url_to;
+        }
 }
