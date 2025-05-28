@@ -55,8 +55,8 @@ class UrlModel extends ActiveRecord
             ['url_to', 'required'],
             [['created_at', 'updated_at', 'views'], 'integer'],
             [['created_at', 'updated_at',],'safe'],
-            [['url_sort'], 'string', 'max' => 100],
-            [['url_to'], 'url', 'defaultScheme' => 'https'],
+            [['url_short'], 'string', 'max' => 100],
+            [['url_to'], 'url', 'defaultScheme' => ['https','http']],
             ['url_to', 'validateUrl'],
         ];
     }
@@ -66,7 +66,7 @@ class UrlModel extends ActiveRecord
     {
         if (parent::beforeSave($insert)) {
             if ($insert) {
-                $this->url_sort=$this->getSortUrl();
+                $this->url_short=$this->getShortUrl();
             }
             return true;
         }
@@ -83,7 +83,7 @@ class UrlModel extends ActiveRecord
             'updated_at' => 'Updated At',
             'url_from' => 'Url From',
             'url_to' => 'Url To',
-            'url_sort' => 'Url Sort',
+            'url_short' => 'Url Sort',
             'ip' => 'Ip',
             'views' => 'Views',
         ];
@@ -112,13 +112,28 @@ class UrlModel extends ActiveRecord
          * @return string
          * функция для сокращения url
          */
-        public function getSortUrl()
+        public function getShortUrl()
         {
-            return $this->url_to;
+            $parts = parse_url($this->url_to);
+
+            if (empty($parts['scheme']) || empty($parts['host'])) {
+                return null;
+            }
+
+            return $parts['scheme'] . '://' . $parts['host'];
         }
 
         public function getLogUrl()
         {
-            return $this->hasMany(UrlLogModel::class, ['url_id' => 'id']);
+            return $this->hasMany(UrlLogModel::class, ['id_url' => 'id']);
         }
+
+    public function getLogsIp()
+    {
+        $IP=[];
+        foreach ($this->logUrl as $item){
+            $IP[$item->ip]=$item->created_at;
+        }
+        return $IP;
+    }
 }

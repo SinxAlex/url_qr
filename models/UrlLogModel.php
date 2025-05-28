@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "url_log".
@@ -27,17 +29,46 @@ class UrlLogModel extends \yii\db\ActiveRecord
         return 'url_log';
     }
 
+
+    /**
+     *
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['created_at'],
+
+                ],
+                'value' => function() { return time(); },
+            ],
+        ];
+    }
     /**
      * {@inheritdoc}
      */
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($insert) {
+                $this->url_from=Yii::$app->request->referrer;
+                $this->ip=Yii::$app->request->userIP;
+            }
+            return true;
+        }
+        return false;
+    }
     public function rules()
     {
         return [
-            [['created_at', 'id_url', 'url_from', 'ip'], 'required'],
+            [['id_url' ], 'required'],
+            [['created_at','ip','url_from'], 'safe'],
             [['created_at', 'id_url'], 'integer'],
             [['url_from'], 'string', 'max' => 250],
             [['ip'], 'string', 'max' => 50],
-            [['id_url'], 'exist', 'skipOnError' => true, 'targetClass' => Url::class, 'targetAttribute' => ['id_url' => 'id']],
+            [['id_url'], 'exist', 'skipOnError' => true, 'targetClass' => UrlModel::class, 'targetAttribute' => ['id_url' => 'id']],
         ];
     }
 
@@ -62,7 +93,17 @@ class UrlLogModel extends \yii\db\ActiveRecord
      */
     public function getUrl()
     {
-        return $this->hasOne(Url::class, ['id' => 'id_url']);
+        return $this->hasOne(UrlModel::class, ['id' => 'id_url']);
     }
 
+
+    public function getLogsIp()
+    {
+        $IP=[];
+        foreach ($this->url as $item){
+            $IP[$item->ip]=$item->created_at;
+        }
+
+        return $IP;
+    }
 }

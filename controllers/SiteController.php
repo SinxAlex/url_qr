@@ -2,8 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\UrlLogModel;
 use Yii;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\filters\VerbFilter;
@@ -130,28 +132,47 @@ class SiteController extends Controller
         return $this->render('about');
     }
 
-    public function actionGetUrl()
+    public function actionGetQr()
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $out = ['success' => false, 'response_error' => '', 'data' => ''];
 
-        $out = ['success' => false,'response_error'=>'','data'=>''];
-
-            $model=new UrlModel();
-            if($model->load(Yii::$app->request->post()) && $model->validate())
+            $url_to=Yii::$app->request->post('UrlModel')['url_to'];
+            if(!$model=UrlModel::findOne(['url_to'=>$url_to]))
             {
+                  $model = new UrlModel();
+                  $model->views=0;
+             }
+            if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+                $model->views=$model->views+1;
+                $model->save();
+
                 $qrCode = (new QrCode($model->url_to))
                     ->setSize(250)
                     ->setMargin(5)
                     ->setBackgroundColor(51, 153, 255);
-
                 $out['success'] = true;
-                $out['data'] = base64_encode($qrCode->writeString());
-
-                $model->views=1;
-                $model->save();
-            }else{
-                $out['response_error'] = $model->errors;
+                $out['data'] = [
+                    'url'=>$model->url_to,
+                    'url-image'=>'data:image/png;base64,'.base64_encode($qrCode->writeString()),
+                    'short_url'=>$model->url_short,
+                    'info'=>$model->getLogsIp(),
+                    ];
+            } else {
+                $out['error'] = json_encode($model->errors);
             }
-        return $out;
-    }
+            return $out;
+        }
+
+        public function actionRedirectQr($url)
+        {
+            $model=UrlModel::findOne(['url_to'=>$url]);
+            if($model){
+                $model_log=new UrlLogModel();
+                $model_log->id_url=$model->id;
+                $model_log->save();
+            }
+            return $this->render('redirect',['url'=>\yii\helpers\Url::to($url)]);
+
+        }
 }

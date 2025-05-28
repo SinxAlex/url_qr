@@ -47,7 +47,8 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
-                'get-url' => '/site/get-url',
+                'get-qr' => '/site/get-qr',
+                'redirect-qr' => '/site/redirect-qr',
             ],
         ],
     ],
