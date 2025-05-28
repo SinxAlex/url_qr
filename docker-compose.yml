@@ -12,12 +12,21 @@ services:
         ports:
             - "8080:80"
         depends_on:
-            - db
+             db:
+                 condition: service_healthy
+        command: >
+            sh -c "php yii migrate/up --interactive=0 --color=1
+            && apache2-foreground"
         networks:
             - my_network
 
     db:
         image: mysql:5.7
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uyii2user", "-psecret" ]
+            interval: 5s
+            timeout: 10s
+            retries: 10
         container_name: yii2_db
         command:
             - --bind-address=0.0.0.0  # Разрешаем подключения с любого IP
