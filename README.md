@@ -1,7 +1,7 @@
 [![Yii2](https://img.shields.io/badge/Yii-2.0.x-blue?logo=yii&style=flat-square)](https://www.yiiframework.com/)
 [![PHP](https://img.shields.io/badge/PHP->=8.0-777BB4?style=flat-square&logo=php)](https://www.php.net/)
 
-# Тестовое задание по yii2, создание QR-кода по ссылке.
+# Тестовое задание в yii2, создание QR-кода по ссылке.
 
 ## Установленные пакеты:
 [![Documentation](https://img.shields.io/badge/docs-qrcode--library-blue?style=flat-square&logo=read-the-docs)](https://qrcode-library.readthedocs.io/en/latest/)
